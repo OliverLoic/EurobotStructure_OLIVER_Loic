@@ -10,12 +10,30 @@ namespace Positioning2WheelsNS
 {
     public class Positioning2Wheels
     {
-        public void OnOdometryRobotSpeedReceived(object sender, PolarSpeedArgs e)
-        {
+        int robotId;
+        Location robotLocation = new Location();
 
+        public Positioning2Wheels(int id)
+        {
+            robotId = id;
         }
 
-        //Output events
+        public void OnOdometryRobotSpeedReceived(object sender, PolarSpeedArgs e)
+        {
+            /// On fait le calcul du nouveau positionnement du robot
+            int fEch = 50;
+            //robotLocation.Theta += (e.Vtheta + variablePrece.Vtheta) / (2 * fEch);
+            //robotLocation.X += Math.Cos(robotLocation.Theta) * ((e.Vx + variablePrece.Vx) / (2 * fEch));
+            //robotLocation.Y += Math.Sin(robotLocation.Theta) * ((e.Vx + variablePrece.Vx) / (2 * fEch));
+
+            robotLocation.Theta += e.Vtheta / fEch;
+            robotLocation.X += Math.Cos(robotLocation.Theta) * (e.Vx / fEch);
+            robotLocation.Y += Math.Sin(robotLocation.Theta) * (e.Vx / fEch);
+
+            OnCalculatedLocation(robotId, robotLocation);
+        }
+
+        /// Output events
         public event EventHandler<LocationArgs> OnCalculatedLocationEvent;
         public virtual void OnCalculatedLocation(int id, Location locationRefTerrain)
         {
